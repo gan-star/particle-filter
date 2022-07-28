@@ -1,0 +1,31 @@
+PF = function(y,m,sigma_obs2,sigma_sys2){
+  #初期分布
+  X_fil0 = matrix(rnorm(m,14,1))
+  #予測分布、フィルタ分布、重み
+  X_pre = matrix(NA_real_,nrow=m,length(y))
+  X_fil = matrix(NA_real_,nrow=m,length(y))
+  all_w = matrix(NA_real_,nrow=m,length(y))
+  #時間更新ルーチン
+  for(t in 1:length(y)){
+    w = c(rep(NA_real_,m))
+    
+    #粒子ごとに計算するルーチン
+    for(i in 1:m){
+      v = rnorm(1,0,sqrt(sigma_sys2))
+      if (t == 1){
+        X_pre[i,1] = X_fil0[i] + v}
+      else{
+        X_pre[i,t] = X_fil[i,t-1] + v}
+      #粒子ごとに尤度計算
+      w[i] = exp((-(y[t]-X_pre[i,t])^2)/(2*sigma_obs2))/(sqrt(2*pi*sigma_obs2))
+    }
+    all_w[,t] = w
+    
+    #リサンプリング
+    X_fil[,t] = sample(X_pre[,t],replace=T ,prob=w)
+  }
+  return(list(X_fil0 = X_fil0,
+              X_fil = X_fil,
+              X_pre = X_pre,
+              all_w = all_w))
+}
