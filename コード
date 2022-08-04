@@ -29,4 +29,15 @@ PF = function(y,m,sigma_obs2,sigma_sys2){
               X_pre = X_pre,
               all_w = all_w))
 }
-# 作成中
+
+sigma_obs2 = 0.2
+alpha2 = 0.05
+sigma_sys2 = sigma_obs2 * alpha2  
+res_PF = PF(y=y,m=m,sigma_obs2=sigma_obs2,sigma_sys2=sigma_sys2)
+
+#結果を見る
+X = res_PF$X_fil
+mean_X = colMeans(X)
+
+plot(y,type='l')
+lines(mean_X,col='blue',type='l')
